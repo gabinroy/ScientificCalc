@@ -26,8 +26,8 @@ A modular, authentic scientific calculator emulator built with **React Native**,
 - **⌨️ Hardware Keyboard Density & Key Shortcuts**:
   - **SHIFT + AC (OFF)**: Displays the `OPENCALC 99X` shutdown banner and either exits the app or enters standby mode (toggleable).
   - **SHIFT + MENU (SETUP / ABOUT)**: Opens the developer bio, license info, theme selector, and open-source support dialog.
-  - **Yellow SHIFT**: Activates calculus ($\int dx, \frac{d}{dx}$), polar/rectangular coordinate conversions ($\text{Pol}, \text{Rec}$), inverse trigonometry ($\sin^{-1}, \cos^{-1}, \tan^{-1}$), factorial ($x!$), permutations ($nPr$), combinations ($nCr$), random numbers ($\text{Ran}\#$), and constants ($\pi$).
-  - **Red ALPHA**: Types memory variables ($A, B, C, D, E, F, M, x, y$), random integers ($\text{RanInt}\#$), and Euler's constant ($e$).
+  - **Yellow SHIFT**: Activates calculus ($\int dx, \frac{d}{dx}$), polar/rectangular coordinate conversions (`Pol`, `Rec`), inverse trigonometry ($\sin^{-1}, \cos^{-1}, \tan^{-1}$), factorial ($x!$), permutations ($nPr$), combinations ($nCr$), random numbers (`Ran#`), and constants ($\pi$).
+  - **Red ALPHA**: Types memory variables ($A, B, C, D, E, F, M, x, y$), random integers (`RanInt#`), and Euler's constant ($e$).
   - **Memory Operations**: Support for $STO \to [A-F, M, x, y]$, $M+$, $M-$, $MR$, and $MC$.
 - **🎛️ 12 Native Calculation Modes**:
   1. **Calculate**: Standard fractions, roots, powers, trig, logs, calculus approximations, coordinate conversions.
