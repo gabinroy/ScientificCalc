@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '../ThemeContext';
 
 export type DeviceFrameType = 'iphone' | 'pixel' | 'none';
 
@@ -18,22 +19,48 @@ interface WebDeviceFrameProps {
 /**
  * components/WebDeviceFrame.tsx
  *
- * Provides a responsive mobile device frame mockup on Desktop Web browsers.
- * - iPhone Style (Rounded dynamic island pill cutout + home bar)
- * - Android Pixel Style (Subtle camera punch-hole + gesture bar)
- * - Full Responsive Screen (On actual mobile web browsers / native iOS & Android)
+ * Provides a responsive container across all form factors:
+ * 1. Mobile Phones (iOS/Android native & mobile web <500px): Pure native full-screen.
+ * 2. Tablets (iPads, Android Tablets & tablet web): Clean hardware-centered chassis (maxWidth: 480px) without fake phone notches.
+ * 3. Desktop Web Browsers: Interactive device simulator with iOS Dynamic Island, Android Pixel Punch-Hole & Borderless toggles.
  */
 export const WebDeviceFrame: React.FC<WebDeviceFrameProps> = ({ children }) => {
   const { width, height } = useWindowDimensions();
+  const { theme } = useTheme();
   const [deviceType, setDeviceType] = useState<DeviceFrameType>('iphone');
 
-  // If on actual iOS or Android native runtime, or on small mobile browser screens, render naturally without frame
-  if (Platform.OS !== 'web' || width < 500) {
+  // Detect tablet or wide screen
+  const isTabletOrWide = width >= 500;
+  const isPadNative = Platform.OS === 'ios' && Platform.isPad;
+  const isAndroidTablet = Platform.OS === 'android' && width >= 600;
+
+  // 1. Mobile Phones: Render standard native layout
+  if (!isTabletOrWide && !isPadNative && !isAndroidTablet) {
     return <View style={styles.nativeContainer}>{children}</View>;
   }
 
-  // Dynamic frame height calculation based on browser viewport
-  const calculatedHeight = Math.min(840, Math.max(720, height - 80));
+  // 2. Native iPad or Android Tablet (Installed App):
+  // Renders a sleek, centered calculator column with authentic physical hardware ergonomics
+  if (isPadNative || isAndroidTablet) {
+    return (
+      <View style={[styles.tabletBackdrop, { backgroundColor: theme.isDark ? '#0b0c10' : '#d0d6e0' }]}>
+        <View
+          style={[
+            styles.tabletChassis,
+            {
+              backgroundColor: theme.background,
+              borderColor: theme.isDark ? '#262a34' : '#b8c0cc',
+            },
+          ]}
+        >
+          {children}
+        </View>
+      </View>
+    );
+  }
+
+  // 3. Desktop Web Simulator (when on web browser width >= 500)
+  const calculatedHeight = Math.min(850, Math.max(720, height - 80));
 
   return (
     <View style={styles.webBackdrop}>
@@ -162,6 +189,23 @@ export const WebDeviceFrame: React.FC<WebDeviceFrameProps> = ({ children }) => {
 const styles = StyleSheet.create({
   nativeContainer: {
     flex: 1,
+  },
+  tabletBackdrop: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabletChassis: {
+    width: '100%',
+    maxWidth: 480,
+    flex: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
   },
   webBackdrop: {
     flex: 1,

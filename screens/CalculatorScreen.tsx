@@ -82,95 +82,92 @@ export const CalculatorScreen: React.FC = () => {
     }
   };
 
-  // Compute Expression via mathEngine without eval
-  const computeCurrentExpression = useCallback(() => {
-    if (isPoweredOff || isShuttingDown) return;
-    setState((prev) => {
-      try {
-        if (prev.mode === 'BASE_N') {
-          const { result } = evaluateBaseN(prev.inputBuffer, prev.baseN);
-          return {
-            ...prev,
-            resultBuffer: result,
-            isShift: false,
-            isAlpha: false,
-          };
-        }
-
-        if (prev.mode === 'TABLE') {
-          const rows = generateTableValues(prev.inputBuffer || 'x^2', -3, 3, 1, prev);
-          setTableDataRows(rows);
-          return {
-            ...prev,
-            resultBuffer: `Generated ${rows.length} rows`,
-            isShift: false,
-            isAlpha: false,
-          };
-        }
-
-        if (prev.mode === 'EQUATION') {
-          const res = solvePolynomial([1, -3, 2]);
-          setEqnOutputs(res);
-          return {
-            ...prev,
-            resultBuffer: res[0] || 'Solved',
-            isShift: false,
-            isAlpha: false,
-          };
-        }
-
-        if (prev.mode === 'RATIO') {
-          const xVal = solveRatio(2, 3, null, 6);
-          return {
-            ...prev,
-            resultBuffer: `X = ${xVal}`,
-            isShift: false,
-            isAlpha: false,
-          };
-        }
-
-        // Standard / Complex / Scientific Calculation
-        const resultVal = evaluateExpression(prev.inputBuffer, prev);
-        
-        let resultStr = `${resultVal}`;
-        if (/Pol\s*\(/i.test(prev.inputBuffer)) {
-          resultStr = `r=${resultVal}, θ=${prev.memory.y}°`;
-        } else if (/Rec\s*\(/i.test(prev.inputBuffer)) {
-          resultStr = `X=${resultVal}, Y=${prev.memory.y}`;
-        }
-
-        const newHistoryItem: CalculationHistoryItem = {
-          id: `${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-          input: prev.inputBuffer,
-          result: resultStr,
-          timestamp: Date.now(),
-        };
-
-        const updatedHistory = [...prev.history, newHistoryItem];
-
+  // Compute Expression Helper that takes a currentState and returns updated State
+  const computeState = useCallback((prev: EngineState): EngineState => {
+    try {
+      if (prev.mode === 'BASE_N') {
+        const { result } = evaluateBaseN(prev.inputBuffer, prev.baseN);
         return {
           ...prev,
-          resultBuffer: resultStr,
-          memory: {
-            ...prev.memory,
-            Ans: resultVal,
-            PreAns: prev.memory.Ans,
-          },
-          history: updatedHistory,
-          historyIndex: -1,
-          isShift: false,
-          isAlpha: false,
-        };
-      } catch (err: any) {
-        return {
-          ...prev,
-          resultBuffer: err.message || 'Math ERROR',
+          resultBuffer: result,
           isShift: false,
           isAlpha: false,
         };
       }
-    });
-  }, [isPoweredOff, isShuttingDown]);
+
+      if (prev.mode === 'TABLE') {
+        const rows = generateTableValues(prev.inputBuffer || 'x^2', -3, 3, 1, prev);
+        setTableDataRows(rows);
+        return {
+          ...prev,
+          resultBuffer: `Generated ${rows.length} rows`,
+          isShift: false,
+          isAlpha: false,
+        };
+      }
+
+      if (prev.mode === 'EQUATION') {
+        const res = solvePolynomial([1, -3, 2]);
+        setEqnOutputs(res);
+        return {
+          ...prev,
+          resultBuffer: res[0] || 'Solved',
+          isShift: false,
+          isAlpha: false,
+        };
+      }
+
+      if (prev.mode === 'RATIO') {
+        const xVal = solveRatio(2, 3, null, 6);
+        return {
+          ...prev,
+          resultBuffer: `X = ${xVal}`,
+          isShift: false,
+          isAlpha: false,
+        };
+      }
+
+      // Standard / Complex / Scientific Calculation
+      const resultVal = evaluateExpression(prev.inputBuffer, prev);
+      
+      let resultStr = `${resultVal}`;
+      if (/Pol\s*\(/i.test(prev.inputBuffer)) {
+        resultStr = `r=${resultVal}, θ=${prev.memory.y}°`;
+      } else if (/Rec\s*\(/i.test(prev.inputBuffer)) {
+        resultStr = `X=${resultVal}, Y=${prev.memory.y}`;
+      }
+
+      const newHistoryItem: CalculationHistoryItem = {
+        id: `${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+        input: prev.inputBuffer,
+        result: resultStr,
+        timestamp: Date.now(),
+      };
+
+      const updatedHistory = [...prev.history, newHistoryItem];
+
+      return {
+        ...prev,
+        resultBuffer: resultStr,
+        memory: {
+          ...prev.memory,
+          Ans: resultVal,
+          PreAns: prev.memory.Ans,
+        },
+        history: updatedHistory,
+        historyIndex: -1,
+        isShift: false,
+        isAlpha: false,
+      };
+    } catch (err: any) {
+      return {
+        ...prev,
+        resultBuffer: err.message || 'Math ERROR',
+        isShift: false,
+        isAlpha: false,
+      };
+    }
+  }, []);
 
   // Master Keypad Dispatcher
   const handleKeyPress = useCallback((keyId: string) => {
@@ -331,8 +328,7 @@ export const CalculatorScreen: React.FC = () => {
           };
 
         case 'EQUALS':
-          computeCurrentExpression();
-          return prev;
+          return computeState(prev);
 
         // --- Calculus Tools (INTEGRAL & DERIVATIVE) ---
         case 'INTEGRAL':
@@ -560,7 +556,7 @@ export const CalculatorScreen: React.FC = () => {
           return prev;
       }
     });
-  }, [computeCurrentExpression, isWaitingForStoreVar, isPoweredOff, isShuttingDown, exitAppOnPowerOff]);
+  }, [computeState, isWaitingForStoreVar, isPoweredOff, isShuttingDown, exitAppOnPowerOff]);
 
   // Handle restoring an item from visual history tape
   const handleSelectTapeItem = (item: CalculationHistoryItem) => {
