@@ -42,6 +42,7 @@ A modular, authentic scientific calculator emulator built with **React Native**,
   10. **Equation/Func**: Simultaneous linear equations & polynomial root solvers.
   11. **Inequality**: Quadratic & polynomial inequality solutions.
   12. **Ratio**: $A:B = X:D$ or $A:B = C:X$ proportional calculators.
+- **🌐 Responsive Web Device Simulator (`WebDeviceFrame`)**: When viewed on desktop web browsers, the app renders inside a realistic mobile device frame with interactive toggles for ** iOS (iPhone Dynamic Island)**, **🤖 Android (Pixel Punch-hole)**, and **📱 Borderless** views.
 - **📱 First-Launch Tutorial (`IntroScreen`)**: Onboarding tutorial persisted with `@react-native-async-storage/async-storage`.
 - **ℹ️ Interactive Quick Guide (`HelpModal`) & About Modal (`AboutModal`)**: Top-bar info manuals detailing all key shortcuts and operations.
 
@@ -61,7 +62,7 @@ OpenCalc 99X is built with a **security-first, zero-telemetry** architecture:
 
 ```
 ScientificCalc/
-├── App.tsx                    # Root component (Orientation lock, AsyncStorage check, ThemeProvider)
+├── App.tsx                    # Root component (Orientation lock, AsyncStorage check, ThemeProvider, WebDeviceFrame)
 ├── ThemeContext.tsx           # Dynamic Light/Dark/System theme provider & color dictionary
 ├── screens/
 │   ├── IntroScreen.tsx        # First-launch onboarding tutorial
@@ -70,7 +71,8 @@ ScientificCalc/
 │   ├── Display.tsx            # Dual-line dot matrix LCD & Mode overlay menu (with power-off standby)
 │   ├── Keypad.tsx             # Physical-style dense scientific button grid with circular D-Pad
 │   ├── HelpModal.tsx          # Interactive quick reference guide
-│   └── AboutModal.tsx         # App Bio, Creator info (G Abin Roy), Theme Selector, and Buy Me a Coffee demo
+│   ├── AboutModal.tsx         # App Bio, Creator info (G Abin Roy), Theme Selector, and Buy Me a Coffee demo
+│   └── WebDeviceFrame.tsx     # Desktop Web responsive mobile device simulator (iOS / Android / Borderless)
 ├── utils/
 │   └── mathEngine.ts          # Custom AST / Shunting-Yard tokenizer & calculus / coordinate engine (no eval)
 ├── assets/                    # App icons (adaptive background, monochrome, foreground, splash)

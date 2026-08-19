@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IntroScreen, FIRST_LAUNCH_KEY } from './screens/IntroScreen';
 import { CalculatorScreen } from './screens/CalculatorScreen';
 import { ThemeProvider } from './ThemeContext';
+import { WebDeviceFrame } from './components/WebDeviceFrame';
 
 /**
  * App.tsx
@@ -16,7 +17,8 @@ import { ThemeProvider } from './ThemeContext';
  * 1. Strict portrait mode locking using expo-screen-orientation.
  * 2. First-launch tutorial check persisted via AsyncStorage.
  * 3. SafeAreaProvider for cross-platform modern layout.
- * 4. ThemeProvider wrapping for automatic system Light/Dark mode detection.
+ * 4. ThemeProvider wrapping for automatic and user-selected Light/Dark theming.
+ * 5. WebDeviceFrame wrapping on desktop web browsers with iOS & Android frame simulation.
  */
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -64,11 +66,13 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        {isFirstLaunch ? (
-          <IntroScreen onDismiss={() => setIsFirstLaunch(false)} />
-        ) : (
-          <CalculatorScreen />
-        )}
+        <WebDeviceFrame>
+          {isFirstLaunch ? (
+            <IntroScreen onDismiss={() => setIsFirstLaunch(false)} />
+          ) : (
+            <CalculatorScreen />
+          )}
+        </WebDeviceFrame>
       </ThemeProvider>
     </SafeAreaProvider>
   );
